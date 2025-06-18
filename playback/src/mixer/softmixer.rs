@@ -30,6 +30,8 @@ impl Mixer for SoftMixer {
         self.volume_ctrl.as_unmapped(mapped_volume)
     }
 
+    
+
     fn set_volume(&self, volume: u16) {
         let mapped_volume = self.volume_ctrl.to_mapped(volume);
         self.volume
@@ -47,8 +49,14 @@ impl SoftMixer {
 
 struct SoftVolume(Arc<AtomicU64>);
 
+// impl VolumeGetter for SoftVolume {
+//     fn attenuation_factor(&self) -> f64 {
+//         f64::from_bits(self.0.load(Ordering::Relaxed))
+//     }
+// }
+
 impl VolumeGetter for SoftVolume {
     fn attenuation_factor(&self) -> f64 {
-        f64::from_bits(self.0.load(Ordering::Relaxed))
+        1.0
     }
 }
