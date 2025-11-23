@@ -640,8 +640,8 @@ impl SpircTask {
             SpircCommand::Pause => self.handle_pause(),
             SpircCommand::Prev => self.handle_prev()?,
             SpircCommand::Next => self.handle_next(None)?,
-            SpircCommand::VolumeUp => self.handle_volume_up(),
-            SpircCommand::VolumeDown => self.handle_volume_down(),
+            SpircCommand::VolumeUp => {},
+            SpircCommand::VolumeDown => {},
             SpircCommand::Shuffle(shuffle) => self.handle_shuffle(shuffle)?,
             SpircCommand::Repeat(repeat) => self.handle_repeat_context(repeat)?,
             SpircCommand::RepeatTrack(repeat) => self.handle_repeat_track(repeat),
@@ -977,7 +977,10 @@ impl SpircTask {
                 return self.notify().await;
             }
             Play(mut play) => {
-                let first_page = play.context.pages.pop();
+                if !self.connect_state.is_active() {
+                    self.handle_activate()
+                }
+
                 let context = match play.context.uri {
                     Some(s) => PlayContext::Uri(s),
                     None if !play.context.pages.is_empty() => PlayContext::Tracks(
@@ -1008,7 +1011,7 @@ impl SpircTask {
                             context_options,
                         },
                     },
-                    first_page,
+                    play.context.pages.pop(),
                 )
                 .await?;
 
